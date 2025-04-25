@@ -226,7 +226,7 @@ p1 <- plot_bar(ps_phylo_rel_domain, x = "Replicate", fill = "Domain", facet_grid
 p1
 ```
 
-![Relative abundance plot](../figures/plot_1.png)
+![Relative abundance plot](files/figures/plot_1.png)
 
 ```
 # Remove Archaea and NAs
@@ -262,7 +262,7 @@ p1b <- plot_bar(ps_phylo_domain, x = "Replicate", fill = "Domain", facet_grid = 
 p1b
 ```
 
-![Count plot](../figures/plot_2.png)
+![Count plot](files/figures/plot_2.png)
 
 #### Pie charts 
 
@@ -317,7 +317,7 @@ p2 <- p2 + facet_grid(rows = vars(Replicate), cols = vars(Method), switch = "y")
 p2
 ```
 
-![Pie charts](../figures/plot_3.png)
+![Pie charts](files/figures/plot_3.png)
 
 #### Boxplot and statistics
 
@@ -407,7 +407,7 @@ p_box <- p_box +
 p_box
 ```
 
-![ANOVA plot](../figures/plot_4.png)
+![ANOVA plot](files/figures/plot_4.png)
 
 #### Merge plots
 
@@ -432,7 +432,7 @@ combined_plot <- (p1b + p_box + p1 + p2) +
 combined_plot
 ```
 
-![Combined plot (Figure 1 in manuscript)](../figures/plot_5.png)
+![Combined plot (Figure 1 in manuscript)](files/figures/plot_5.png)
 
 #### Bacterial reads and NTUs plots
 
@@ -485,7 +485,7 @@ nb_phylo <- ggplot(phylo_nb, aes(x = Method, y = Nb_phylo)) +
 nb_reads + nb_phylo
 ```
 
-![Number of bacterial reads and number of NTUs](../figures/plot_6.png)
+![Number of bacterial reads and number of NTUs](files/figures/plot_6.png)
 
 #### Statistics 
 
@@ -635,7 +635,7 @@ combined_plot <- (nb_reads + nb_phylo) +
 combined_plot
 ```
 
-![Number of bacterial reads and number of NTUs with statistics](../figures/plot_7.png)
+![Number of bacterial reads and number of NTUs with statistics](files/figures/plot_7.png)
 
 #### Prokaryotic taxonomy
 
@@ -713,7 +713,7 @@ p <- plot_bar(ps_phylo_prok_rel, x = "Replicate", fill = "Phylum", facet_grid = 
 p
 ```
 
-![Relative abundance of prokaryotic NTUs](../figures/plot_8.png)
+![Relative abundance of prokaryotic NTUs](files/figures/plot_8.png)
 
 
 #### PERMANOVA and NMDS
@@ -748,7 +748,7 @@ p4 <- ggplot(nmds_data, aes(x = NMDS1, y = NMDS2, color = Method)) +
 p4
 ```
 
-![NMDS](../figures/plot_9.png)
+![NMDS](files/figures/plot_9.png)
 
 ```
 # Effectuer une PERMANOVA avec 999 permutations
@@ -845,7 +845,7 @@ combined_plot <- (p3 | (nb_phylo / nb_reads / p4)) +
 combined_plot
 ```
 
-![Combined plot (Figure 3 in manuscript)](../figures/plot_10.png)
+![Combined plot (Figure 3 in manuscript)](files/figures/plot_10.png)
 
 ## Mask and remove *Aedes aegypti* genome sequences
 
@@ -1223,7 +1223,7 @@ p5 <- ggplot(df3, aes(x = replicate, y = bins, fill = t_class)) +
 p5
 ```
 
-![Number of bins by sample and condition](../figures/plot_11.png)
+![Number of bins by sample and condition](files/figures/plot_11.png)
 
 ```
 # Create dataframe for number of reads by sample and condition
@@ -1262,7 +1262,7 @@ p6 <- ggplot(df_test, aes(x = replicate, y = genome_reads)) +
 p6 
 ```
 
-![Number of genome reads by sample and condition](../figures/plot_12.png)
+![Number of genome reads by sample and condition](files/figures/plot_12.png)
 
 ```
 tag_labels <- c("A", "B")
@@ -1283,7 +1283,7 @@ combined_plot <- (p5 + p6) +
 combined_plot
 ```
 
-![Combined figure (Figure 5 in manuscript)](../figures/plot_13.png)
+![Combined figure (Figure 5 in manuscript)](files/figures/plot_13.png)
 
 ## Phylogenomics
 
