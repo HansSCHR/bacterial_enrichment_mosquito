@@ -89,13 +89,6 @@ done
 
 ### Plots and statistics
 
-
-Then, we used this Rmarkdown script to estimate host contamination using phyloflash outputs, generate plots and compute statistics: 
-[phyloflash_plot.Rmd](files/phyloflash_plot.Rmd)
-
-The HTML report from Rmarkdown file is also available here: 
-[phyloflash_plot.html](files/phyloflash_plot.html)
-
 #### Import data and create phyloseq object 
 
 ```
