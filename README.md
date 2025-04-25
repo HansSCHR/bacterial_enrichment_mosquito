@@ -744,17 +744,17 @@ p4
 ![NMDS](files/figures/plot_9.png)
 
 ```
-# Effectuer une PERMANOVA avec 999 permutations
+# Compute PERMANOVA using 999 permutations
 perm_results <- adonis2(bray_dist ~ Method + Total_Reads, data = as(sample_data(ps_phylo_prok_rel), "data.frame"), permutations = 999)
 perm_results2 <- adonis2(bray_dist ~ Method, data = as(sample_data(ps_phylo_prok_rel), "data.frame"), permutations = 999)
 perm_results3 <- adonis2(bray_dist ~ Total_Reads, data = as(sample_data(ps_phylo_prok_rel), "data.frame"), permutations = 999)
 
-# Afficher les résultats
+# Display results
 print(perm_results)
 print(perm_results2)
 print(perm_results3)
 
-# Vérifier l'homogénéité des dispersions entre groupes
+# Check homogeneity and groups dispersion
 dispersion <- betadisper(bray_dist, sample_data(ps_phylo_prok_rel)$Method)
 permutest(dispersion)
 ```
@@ -1442,3 +1442,5 @@ anvi-interactive -p phylogenomic-profile-Sphingomonas.db \
                  --manual
 conda deactivate
 ```
+
+![Example: Cutibacterium phylogenomics tree](files/figures/plot_14.png)
