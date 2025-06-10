@@ -248,7 +248,10 @@ p1b <- plot_bar(ps_phylo_domain, x = "Replicate", fill = "Domain", facet_grid = 
   theme(axis.text = element_text(size = 12),
         axis.text.x = element_text(size = 12, angle = 45, hjust = 0.5, vjust = 0.6),
         axis.title = element_text(size = 14), 
-        strip.text = element_text(face = "bold", size = 14)) +
+        strip.text = element_text(face = "bold", size = 14),
+        legend.title      = element_text(size = 14),
+        legend.text       = element_text(size = 12),
+        legend.key.size   = unit(1.2, "lines")) +
   coord_flip()
 
 # Display count plot
@@ -294,7 +297,10 @@ p2 <- ggplot(pie_data, aes(x = "", y = Percentage, fill = Category)) +
   theme_void() +
   theme(legend.position = "right",
         strip.text = element_text(face = "bold", size = 14),
-        legend.spacing.x = unit(1, 'cm')) +
+        legend.spacing.x = unit(1, 'cm'),
+        legend.title      = element_text(size = 14),
+        legend.text       = element_text(size = 12),
+        legend.key.size   = unit(1.2, "lines")) +
   geom_text(aes(label = paste0(round(Percentage, 1), "%")), 
             position = position_stack(vjust = 0.5), size = 4, color = "black")
 
@@ -319,17 +325,17 @@ p2
 df_p1 <- p1$data
 
 # Keep only Eukaryota
-df_euk <- df_p1 %>%
-  filter(Domain == "Eukaryota")
+df_bac <- df_p1 %>%
+  filter(Domain == "Bacteria")
 
 # Set Method as factor
-df_euk$Method <- as.factor(df_euk$Method)
+df_bac$Method <- as.factor(df_bac$Method)
 
 # Boxplot of mean eukaryotic reads from each sample
-p_box <- ggplot(df_euk, aes(x = Method, y = Abundance)) +
+p_box <- ggplot(df_bac, aes(x = Method, y = Abundance)) +
   geom_boxplot(outlier.shape = NA, width = 0.5, color = "black") +
   geom_jitter(aes(color = Method), width = 0.15, size = 3) +
-  labs(x = "", y = "Eukaryotic Reads (%)") +
+  labs(x = "", y = "Bacterial Reads (%)") +
   scale_color_manual(values = c("DNeasy NF" = "blue", "DNeasy F" = "#C71585", "Microbiome kit" = "#228B22")) +
   theme_classic() +  
   theme(legend.position = "none",  
@@ -337,13 +343,16 @@ p_box <- ggplot(df_euk, aes(x = Method, y = Abundance)) +
         axis.text.y = element_text(face = "bold", size = 12),
         axis.title.y = element_text(size = 14, face = "bold"),  
         axis.line = element_line(linewidth = 1),  
-        axis.ticks = element_line(linewidth = 1))
+        axis.ticks = element_line(linewidth = 1),
+        legend.title      = element_text(size = 14),
+        legend.text       = element_text(size = 12),
+        legend.key.size   = unit(1.2, "lines"))
 
 # Display boxplot
 p_box
 
 # Compute ANOVA by Method
-anova_result <- aov(Abundance ~ Method, data = df_euk)
+anova_result <- aov(Abundance ~ Method, data = df_bac)
 
 # Tukey's post-hoc test
 tukey_result <- TukeyHSD(anova_result)
@@ -381,8 +390,8 @@ df_tukey <- df_tukey %>%
 print(df_tukey)
 
 # Change levels of Tukey's group
-df_tukey$group1 <- factor(df_tukey$group1, levels = levels(df_euk$Method))
-df_tukey$group2 <- factor(df_tukey$group2, levels = levels(df_euk$Method))
+df_tukey$group1 <- factor(df_tukey$group1, levels = levels(df_bac$Method))
+df_tukey$group2 <- factor(df_tukey$group2, levels = levels(df_bac$Method))
 
 # Set p-value decimals
 df_tukey$p_value <- formatC(df_tukey$p_value, format = "f", digits = 4)
@@ -393,7 +402,7 @@ p_box <- p_box +
                      label = "p_value", 
                      xmin = "group1", 
                      xmax = "group2",
-                     y.position = c(max(df_euk$Abundance) + 5, max(df_euk$Abundance) + 10, max(df_euk$Abundance) + 15),
+                     y.position = c(max(df_bac$Abundance) + 5, max(df_bac$Abundance) + 10, max(df_bac$Abundance) + 15),
                      tip.length = 0.02, size = 5, inherit.aes=FALSE)
 
 # Display boxplot including p-values
@@ -421,15 +430,13 @@ combined_plot <- (p1b + p_box + p1 + p2) +
     plot.tag = element_text(size = 18, face = "bold")
   )
 
-# Display combined plotAffichage de la figure combinée
+# Display combined plot
 combined_plot
 ```
 
 ![Combined plot (Figure 1 in manuscript)](files/figures/plot_5.png)
 
 #### Bacterial reads and NTUs plots
-
-We now focus only on Bacteria. 
 
 ```
 # Select only Bacteria
@@ -448,9 +455,17 @@ phylo_nb$Nb_phylo <- apply(ps_phylo_prok@otu_table > 0, 2, sum)
 phylo_nb$Method <- factor(phylo_nb$Method,
                                   levels = c("DNeasy NF", "DNeasy F", "Microbiome kit"))
 
+# Set colors for Methods
+my_colors <- c(
+  "DNeasy NF"      = "blue",
+  "DNeasy F"       = "#C71585",
+  "Microbiome kit" = "#228B22"
+)
+
 # Plot of number of reads by method
-nb_reads <- ggplot(phylo_nb, aes(x = Method, y = Total_reads)) +
+nb_reads <- ggplot(phylo_nb, aes(x = Method, y = Total_reads, fill = Method)) +
   geom_violin() + geom_boxplot(width=0.1,color="black") +
+  scale_fill_manual(values = my_colors) +
   theme_bw() +
   theme(axis.text = element_text(size = 12, angle = 0),
         axis.text.x=element_text(size = 12, angle = 45, hjust = 1),
@@ -462,8 +477,9 @@ nb_reads <- ggplot(phylo_nb, aes(x = Method, y = Total_reads)) +
   ylab("Bacterial reads count") + scale_y_log10()
       
 # Plot of number of NTUs by method
-nb_phylo <- ggplot(phylo_nb, aes(x = Method, y = Nb_phylo)) +
+nb_phylo <- ggplot(phylo_nb, aes(x = Method, y = Nb_phylo, fill = Method)) +
   geom_violin() + geom_boxplot(width=0.1,color="black") +
+  scale_fill_manual(values = my_colors) +
   theme_bw() +
   theme(axis.text = element_text(size = 12, angle = 0),
         axis.text.x=element_text(size = 12, angle = 45, hjust = 1),
