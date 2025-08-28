@@ -1,0 +1,82 @@
+{
+    "fasta_txt": "",
+    "centrifuge": {
+        "run": false
+    },
+    "anvi_run_hmms": {
+        "run": false
+    },
+    "anvi_run_kegg_kofams": {
+        "run": false
+    },
+    "anvi_run_ncbi_cogs": {
+        "run": false
+    },
+    "anvi_run_scg_taxonomy": {
+        "run": false
+    },
+    "anvi_run_trna_scan": {
+        "run": false
+    },
+    "anvi_script_reformat_fasta": {
+        "run": true,
+        "--prefix": "{group}",
+        "--simplify-names": true,
+        "--keep-ids": "",
+        "--exclude-ids": "",
+        "--min-len": "",
+        "--seq-type": "",
+        "threads": ""
+    },
+    "samples_txt": "samples_minoche.txt",
+    "metaspades": {
+        "run": false
+    },
+    "megahit": {
+        "run": false
+    },
+    "idba_ud": {
+        "run": true
+    },
+    "iu_filter_quality_minoche": {
+        "run": true,
+        "--ignore-deflines": true,
+        "--visualize-quality-curves": "",
+        "--limit-num-pairs": "",
+        "--print-qual-scores": "",
+        "--store-read-fate": "",
+        "threads": 12
+    },
+    "gzip_fastqs": {
+        "run": true,
+        "threads": ""
+    },
+    "remove_short_reads_based_on_references": {
+        "delimiter-for-iu-remove-ids-from-fastq": " ",
+        "dont_remove_just_map": "",
+        "references_for_removal_txt": "",
+        "threads": ""
+    },
+    "gen_qc_report": {
+        "threads": 2
+    },
+    "references_mode": "",
+    "all_against_all": false,
+    "kraken_txt": "",
+    "collections_txt": "",
+    "output_dirs": {
+        "FASTA_DIR": "02_FASTA",
+        "CONTIGS_DIR": "03_CONTIGS",
+        "QC_DIR": "01_QC",
+        "MAPPING_DIR": "04_MAPPING",
+        "PROFILE_DIR": "05_ANVIO_PROFILE",
+        "MERGE_DIR": "06_MERGED",
+        "TAXONOMY_DIR": "07_TAXONOMY",
+        "SUMMARY_DIR": "08_SUMMARY",
+        "SPLIT_PROFILES_DIR": "09_SPLIT_PROFILES",
+        "LOGS_DIR": "00_LOGS"
+    },
+    "max_threads": "",
+    "config_version": "3",
+    "workflow_name": "metagenomics"
+}

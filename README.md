@@ -23,7 +23,7 @@ We analyzed 9 samples of pooled midguts from *Aedes aegypti* females (Paea strai
 
 We removed adapters using the following adapters and code:
 
-[adapters.txt](files/adapters_reduced.txt)
+[adapters.fa](files/adapters.fa)
 
 ```
 for r1 in *_R1_001.fastq.gz
@@ -61,6 +61,10 @@ anvi-run-workflow -w metagenomics \
                   --additional-params --until gzip_fastqs --rerun-incomplete
 
 ```
+
+[samples_minoche.txt](files/samples_minoche.txt)
+[config_minoche.json](files/config_minoche.json)
+
 
 ## Phyloflash
 
@@ -331,7 +335,7 @@ df_bac <- df_p1 %>%
 # Set Method as factor
 df_bac$Method <- as.factor(df_bac$Method)
 
-# Boxplot of mean eukaryotic reads from each sample
+# Boxplot of mean bacterialreads from each sample
 p_box <- ggplot(df_bac, aes(x = Method, y = Abundance)) +
   geom_boxplot(outlier.shape = NA, width = 0.5, color = "black") +
   geom_jitter(aes(color = Method), width = 0.15, size = 3) +
@@ -416,11 +420,12 @@ p_box
 ```
 require(patchwork)
 
-tag_labels <- c("A", "C", "B", "D")
+tag_labels <- c("A", "B")
                 
 # Combine plots and legends
-combined_plot <- (p1b + p_box + p1 + p2) + 
-  plot_layout(ncol = 2, widths = c(1.3, 1)) +
+combined_plot <- (p1b + p_box) +
+  plot_layout(ncol = 2, widths = c(2, 1)) +  # Largeur ajustée
+  #plot_layout(heights = c(1, 1)) +
   plot_annotation(title = "", tag_levels = list(tag_labels), tag_suffix = ".") & 
   theme(
     legend.position = "right",
@@ -435,6 +440,32 @@ combined_plot
 ```
 
 ![Combined plot (Figure 1 in manuscript)](files/figures/plot_5.png)
+
+
+```
+require(patchwork)
+
+tag_labels <- c("A", "B")
+                
+# Combine plots and legends
+  combined_plot2 <- (p1 + p2) +
+  plot_layout(ncol = 2, widths = c(2, 1)) +  # Largeur ajustée
+  #plot_layout(heights = c(1, 1)) +
+  plot_annotation(title = "", tag_levels = list(tag_labels), tag_suffix = ".") & 
+  theme(
+    legend.position = "right",
+    legend.justification = "center",
+    legend.box = "vertical",
+    legend.spacing.y = unit(0.5, "cm"),
+    plot.tag = element_text(size = 18, face = "bold")
+  )
+
+# Display combined plot
+combined_plot2
+```
+
+![Combined plot (Figure S1 in manuscript)](files/figures/plot_6.png)
+
 
 #### Bacterial reads and NTUs plots
 
@@ -494,7 +525,7 @@ nb_phylo <- ggplot(phylo_nb, aes(x = Method, y = Nb_phylo, fill = Method)) +
 nb_reads + nb_phylo
 ```
 
-![Number of bacterial reads and number of NTUs](files/figures/plot_6.png)
+![Number of bacterial reads and number of NTUs](files/figures/plot_7.png)
 
 #### Statistics 
 
@@ -644,7 +675,7 @@ combined_plot <- (nb_reads + nb_phylo) +
 combined_plot
 ```
 
-![Number of bacterial reads and number of NTUs with statistics](files/figures/plot_7.png)
+![Number of bacterial reads and number of NTUs with statistics](files/figures/plot_8.png)
 
 #### Prokaryotic taxonomy
 
@@ -722,7 +753,80 @@ p <- plot_bar(ps_phylo_prok_rel, x = "Replicate", fill = "Phylum", facet_grid = 
 p
 ```
 
-![Relative abundance of prokaryotic NTUs](files/figures/plot_8.png)
+![Relative abundance of prokaryotic NTUs](files/figures/plot_9.png)
+
+```
+scale_taxon = c("#FF4500", "grey26", "#32CD32", "#4169e1", "#e0e0e0", "#00bfff", 
+                "#99ff99", "#a020f0", "#006400", "#00FFFF", "#FFD700", "#FF1493", 
+                "#DAA520", "#8B4513", "#FFA500", "#6B8E23", "darkblue", 
+                "mediumorchid3", "#508578", "gold")
+
+
+# We will do relative abundance, but please be aware that we are dealing with very widely different number of phylotypes here
+ps_phylo_prok_rel <- ps_phylo_prok
+
+taxo <- data.frame(ps_phylo_prok_rel@tax_table)
+taxo$Phylum_keep <- taxo$Phylum
+taxo <- as.data.table(taxo)
+
+# more resolution in Proteobacteria and Crenarchaeota for clarity
+taxo[Class=="Alphaproteobacteria", Phylum:="Proteobac.: Alphaproteobacteria"]
+taxo[Class=="Gammaproteobacteria", Phylum:="Proteobac.: Gammaproteobacteria"]
+taxo[Class=="Zetaproteobacteria", Phylum:="Proteobac.: Zetaproteobacteria"]
+taxo[Class=="Magnetococcia", Phylum:="Proteobac.: Magnetococcia"]
+taxo[Phylum=="Proteobacteria" & is.na(Class), Phylum:="Unassigned Proteobacteria"]
+taxo[Class=="Bathyarchaeia", Phylum:="Crenarchaeota: Bathyarchaeia"]
+taxo[Class=="Nitrososphaeria", Phylum:="Crenarchaeota: Nitrososphaeria"]
+taxo[Phylum=="Crenarchaeota", Phylum:="Crenarchaeota (NA)"]
+taxo[Phylum=="(Bacteria)", Phylum:="Unassigned bacteria"]
+taxo[Phylum=="(Archaea)", Phylum:="Unassigned archaea"]
+
+taxo <- as.matrix(taxo)
+rownames(taxo) <- taxa_names(ps_phylo_prok_rel)
+
+ps_phylo_prok_rel <- phyloseq(otu_table(ps_phylo_prok_rel), tax_table(taxo), sample_data(ps_phylo_prok_rel))
+
+general_taxo_phy <- tax_glom(ps_phylo_prok_rel, taxrank=rank_names(ps_phylo_prok_rel)[2], NArm=FALSE)
+
+df_phy <- data.frame(general_taxo_phy@tax_table[,c(1:2)])
+df_phy$percent <- signif((taxa_sums(general_taxo_phy) * 100 / 9), 3)
+df_phy <- df_phy[order(-df_phy$percent),]
+
+# # keep 17 most abundant
+phylum_to_keep <- df_phy$Phylum[1:19]
+
+# # keep chosen phyla and group the rest in "Others"
+taxo <- as.data.table(taxo)
+taxo$Phylum[(taxo$Phylum %in% phylum_to_keep) == FALSE] <- "Others"
+
+taxo <- as.matrix(taxo)
+rownames(taxo) <- taxa_names(ps_phylo_prok_rel)
+
+ps_phylo_prok_rel <- phyloseq(otu_table(ps_phylo_prok_rel), tax_table(taxo), sample_data(ps_phylo_prok_rel))
+
+# aggregate by phylum
+ps_phylo_prok_rel <- tax_glom(ps_phylo_prok_rel, taxrank = rank_names(ps_phylo_prok_rel)[2], NArm = FALSE)
+
+# order levels of Method and Domain
+ps_phylo_prok_rel@sam_data$Method <- factor(ps_phylo_prok_rel@sam_data$Method, 
+                                              levels = c("DNeasy NF", "DNeasy F", "Microbiome kit"))
+
+# plot
+p3_count <- plot_bar(ps_phylo_prok_rel, x = "Replicate", fill = "Phylum", facet_grid = ~Method) + 
+  geom_col(aes(color = Phylum), position = "stack") +
+  labs(x = "Sample", y = "Reads distribution (count)", fill="Phylum") +
+  scale_color_manual(values = scale_taxon) +
+  scale_fill_manual(values = scale_taxon) +
+  theme_bw() +
+  theme(axis.text = element_text(size = 12, angle = 0), 
+        axis.title = element_text(size = 14), 
+        strip.text = element_text(face = "bold", size = 14), 
+        legend.text = element_text(size = 12), 
+        legend.title = element_text(size = 14)) 
+p3_count
+```
+
+![Count of prokaryotic NTUs](files/figures/plot_10.png)
 
 
 #### PERMANOVA and NMDS
@@ -757,7 +861,7 @@ p4 <- ggplot(nmds_data, aes(x = NMDS1, y = NMDS2, color = Method)) +
 p4
 ```
 
-![NMDS](files/figures/plot_9.png)
+![NMDS](files/figures/plot_11.png)
 
 ```
 # Compute PERMANOVA using 999 permutations
@@ -854,7 +958,295 @@ combined_plot <- (p3 | (nb_phylo / nb_reads / p4)) +
 combined_plot
 ```
 
-![Combined plot (Figure 3 in manuscript)](files/figures/plot_10.png)
+![Combined plot (Figure 3 in manuscript)](files/figures/plot_12.png)
+
+
+#### NTUs Upset plot
+
+```
+# upset plot
+library(UpSetR)
+library(ggplot2)
+
+# function to make graph for Upset package
+graph_for_upset <- function(phylo, parameter){
+  data.mat.raref <- psmelt(phylo)
+  data.mat.raref <- data.mat.raref[data.mat.raref$Abundance>0,]
+  
+  data.mat.raref$OTU=factor(data.mat.raref$OTU) # OTUid
+  groups <- unique(data.mat.raref[[parameter]])
+  
+  graph<-lapply(groups,function(X){
+    p <- data.mat.raref[data.mat.raref[[parameter]]==X,] 
+    unique(p$OTU)
+    })
+  names(graph)<-groups
+  return(graph)
+}
+
+# Number of ASVs shared between methods
+graph <- graph_for_upset(ps_phylo_prok, "Method")
+df_graph <- fromList(graph)
+df_graph <- as.data.frame(df_graph)
+
+pupset <- ComplexUpset::upset(
+  df_graph,
+  intersect = c("DNeasy NF","DNeasy F","Microbiome kit"),
+  keep_empty_groups = TRUE,
+  base_annotations = list(
+    "Intersection size (NTUs)" = ComplexUpset::intersection_size()
+  ),
+  set_sizes = ComplexUpset::upset_set_size() + ylab("Set size (NTUs)")
+) +
+  theme(
+    axis.text.x  = element_blank(),
+    axis.ticks.x = element_blank()
+  )
+
+pupset
+```
+
+![Upset plot)](files/figures/plot_13.png)
+
+##### NTUs Intersection plot
+
+```
+# relative abundance of the categories
+intersect_percent <- data.table("Method" = c("DNeasy NF", "DNeasy F", "Microbiome kit"),
+                                "Only Microbiome" = c(0,0,0),
+                                "Shared by all" = c(0,0,0),
+                                "Microbiome + DNeasy F" = c(0,0,0),
+                                "Only DNeasy F" = c(0,0,0),
+                                "Other" = c(0,0,0))
+
+ps_phylo_microbio <- subset_samples(ps_phylo_prok, Method == "Microbiome kit")
+ps_phylo_F <- subset_samples(ps_phylo_prok, Method == "DNeasy F")
+ps_phylo_NF <- subset_samples(ps_phylo_prok, Method == "DNeasy NF")
+
+# microbiome specific
+intersect_percent[3,2] <- sum(sample_sums(
+  prune_taxa(as.character(setdiff(setdiff(graph$`Microbiome kit`, graph$`DNeasy F`), graph$`DNeasy NF`)),
+             ps_phylo_microbio))) / sum(sample_sums(ps_phylo_microbio)) * 100
+
+# Shared by all
+taxa_shared <- as.character(Reduce(intersect, list(graph$`Microbiome kit`, graph$`DNeasy F`, graph$`DNeasy NF`)))
+  
+intersect_percent[1,3] <- sum(sample_sums(prune_taxa(taxa_shared, ps_phylo_NF))) / 
+  sum(sample_sums(ps_phylo_NF)) * 100
+
+intersect_percent[2,3] <- sum(sample_sums(prune_taxa(taxa_shared, ps_phylo_F))) / 
+  sum(sample_sums(ps_phylo_F)) * 100
+
+intersect_percent[3,3] <- sum(sample_sums(prune_taxa(taxa_shared, ps_phylo_microbio))) / 
+  sum(sample_sums(ps_phylo_microbio)) * 100
+
+# Microbiome and DNeasy F
+intersect_percent[2,4] <- sum(sample_sums(
+  prune_taxa(as.character(setdiff(intersect(graph$`Microbiome kit`, graph$`DNeasy F`), graph$`DNeasy NF`)),
+             ps_phylo_F))) / 
+  sum(sample_sums(ps_phylo_F)) * 100
+
+intersect_percent[3,4] <- sum(sample_sums(
+  prune_taxa(as.character(setdiff(intersect(graph$`Microbiome kit`, graph$`DNeasy F`), graph$`DNeasy NF`)),
+             ps_phylo_microbio))) / 
+  sum(sample_sums(ps_phylo_microbio)) * 100
+
+# Only DNeasy F
+intersect_percent[2,5] <- sum(sample_sums(
+  prune_taxa(as.character(setdiff(setdiff(graph$`DNeasy F`, graph$`Microbiome kit`), graph$`DNeasy NF`)),
+             ps_phylo_F))) / 
+  sum(sample_sums(ps_phylo_F)) * 100
+
+# Other
+intersect_percent$Other <- 100 - rowSums(intersect_percent[,c(2:5)])
+
+intersect_percent
+
+
+melt_intersect <- melt(intersect_percent, id.vars = c("Method"))
+
+melt_intersect$Method <- factor(melt_intersect$Method,
+                                levels = c("DNeasy NF", "DNeasy F", "Microbiome kit"))
+
+melt_intersect$variable <- factor(
+  melt_intersect$variable,
+  levels = c("Shared by all",
+             "Only Microbiome",
+             "Microbiome + DNeasy F",
+             "Only DNeasy F",
+             "Other")
+)
+
+custom_cols <- c(
+  "Shared by all"        = "#4575b4",  # bleu
+  "Only Microbiome"      = "#984ea3",  # violet
+  "Microbiome + DNeasy F"= "#4daf4a",  # vert
+  "Only DNeasy F"        = "#ff7f00",  # orange
+  "Other"                = "grey70"    # gris
+)
+
+gg1 <- ggplot(melt_intersect, aes(x = Method, y = value, fill = variable)) +
+  geom_bar(stat = "identity", position = "stack", width = 0.7) +
+  #scale_fill_brewer(palette = "Set2") +
+  scale_fill_manual(values = custom_cols) +
+  labs(
+    y = "Relative abundance of NTUs (%)",
+    x = NULL,
+    fill = NULL
+  ) +
+  theme_classic(base_size = 14) +
+  theme(
+    axis.text.x  = element_text(size = 12),
+    axis.text.y  = element_text(size = 12),
+    axis.title.y = element_text(size = 14, face = "bold"),
+    legend.position = "right",
+    legend.text = element_text(size = 12),
+    plot.title = element_text(size = 16, face = "bold")
+  )
+
+gg1
+```
+
+![NTUs Intersection plot (%))](files/figures/plot_14.png)
+
+```
+# same with number of reads
+intersect_number <- data.table("Method" = c("DNeasy NF", "DNeasy F", "Microbiome kit"),
+                                "Only Microbiome" = c(0,0,0),
+                                "Shared by all" = c(0,0,0),
+                                "Microbiome + DNeasy F" = c(0,0,0),
+                                "Only DNeasy F" = c(0,0,0),
+                                "Other" = c(0,0,0))
+
+# microbiome specific
+intersect_number[3,2] <- sum(sample_sums(
+  prune_taxa(as.character(setdiff(setdiff(graph$`Microbiome kit`, graph$`DNeasy F`), graph$`DNeasy NF`)),
+             ps_phylo_microbio))) 
+
+# Shared by all
+taxa_shared <- as.character(Reduce(intersect, list(graph$`Microbiome kit`, graph$`DNeasy F`, graph$`DNeasy NF`)))
+  
+intersect_number[1,3] <- sum(sample_sums(prune_taxa(taxa_shared, ps_phylo_NF))) 
+
+intersect_number[2,3] <- sum(sample_sums(prune_taxa(taxa_shared, ps_phylo_F))) 
+
+intersect_number[3,3] <- sum(sample_sums(prune_taxa(taxa_shared, ps_phylo_microbio))) 
+
+# Microbiome and DNeasy F
+intersect_number[2,4] <- sum(sample_sums(
+  prune_taxa(as.character(setdiff(intersect(graph$`Microbiome kit`, graph$`DNeasy F`), graph$`DNeasy NF`)),
+             ps_phylo_F))) 
+
+intersect_number[3,4] <- sum(sample_sums(
+  prune_taxa(as.character(setdiff(intersect(graph$`Microbiome kit`, graph$`DNeasy F`), graph$`DNeasy NF`)),
+             ps_phylo_microbio)))
+
+# Only DNeasy F
+intersect_number[2,5] <- sum(sample_sums(
+  prune_taxa(as.character(setdiff(setdiff(graph$`DNeasy F`, graph$`Microbiome kit`), graph$`DNeasy NF`)),
+             ps_phylo_F))) 
+
+# Other
+intersect_number$Other[1] <- sum(phylo_nb[phylo_nb$Method == "DNeasy NF", "Total_reads"]) - rowSums(intersect_number[1,c(2:5)])
+
+intersect_number$Other[2] <- sum(phylo_nb[phylo_nb$Method == "DNeasy F", "Total_reads"]) - rowSums(intersect_number[2,c(2:5)])
+
+intersect_number$Other[3] <- sum(phylo_nb[phylo_nb$Method == "Microbiome kit", "Total_reads"]) - rowSums(intersect_number[3,c(2:5)])
+
+intersect_number
+
+melt_intersect <- melt(intersect_number, id.vars = c("Method"))
+
+melt_intersect$Method <- factor(melt_intersect$Method,
+                                levels = c("DNeasy NF", "DNeasy F", "Microbiome kit"))
+
+melt_intersect$variable <- factor(
+  melt_intersect$variable,
+  levels = c("Shared by all",
+             "Only Microbiome",
+             "Microbiome + DNeasy F",
+             "Only DNeasy F",
+             "Other")
+)
+
+gg2_styled <- ggplot(melt_intersect, aes(x = Method, y = value, fill = variable)) +
+  geom_bar(stat = "identity", position = "stack", width = 0.7) +
+  facet_wrap(~ Method, scales = "free", nrow = 1) +
+  scale_fill_manual(values = custom_cols, name = NULL) +
+  labs(y = "Number of NTUs reads (%)",   # même label Y
+       x = NULL) +
+  theme_classic(base_size = 14) +
+  theme(
+    axis.text.x  = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.text.y  = element_text(size = 12),
+    axis.title.y = element_text(size = 14, face = "bold"),
+    legend.position = "right",
+    legend.text = element_text(size = 12),
+    strip.background = element_blank(),
+    strip.text = element_text(size = 12, face = "bold"),
+    panel.spacing = unit(1, "lines")
+  )
+  
+gg2_styled
+
+```
+
+![NTUs Intersection plot (count))](files/figures/plot_15.png)
+
+```
+gg3_styled <- ggplot(melt_intersect, aes(x = Method, y = value, fill = variable)) +
+  geom_bar(stat = "identity", position = "stack", width = 0.7) +
+  scale_fill_manual(values = custom_cols, name = NULL) +
+  labs(y = "Number of NTUs reads (%)",   # même label Y
+       x = NULL) +
+  theme_classic(base_size = 14) +
+  theme(
+    axis.text.x  = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.text.y  = element_text(size = 12),
+    axis.title.y = element_text(size = 14, face = "bold"),
+    legend.position = "right",
+    legend.text = element_text(size = 12),
+    strip.background = element_blank(),
+    strip.text = element_text(size = 12, face = "bold"),
+    panel.spacing = unit(1, "lines")
+  )
+  
+gg3_styled
+
+```
+
+![NTUs Intersection plot (count with free y-axis))](files/figures/plot_16.png)
+
+```
+library(patchwork)
+
+
+tag_labels <- c("A", "B", "C")
+pA <- wrap_elements(pupset2)
+
+#/ gg3_styled
+                
+# Combinaison des graphiques avec légende fusionnée en bas
+combined_plot <- (pA / (gg1 + gg2_styled)) + 
+  #plot_layout(ncol = 1, widths = c(2, 1)) +  # adjuster ajustée
+  plot_layout(heights = c(2, 1)) +
+  plot_annotation(title = "", tag_levels = list(tag_labels), tag_suffix = ".") & 
+  theme(
+    legend.position = "right",
+    legend.justification = "center",
+    legend.box = "vertical",
+    legend.spacing.y = unit(0.5, "cm"),
+    plot.tag = element_text(size = 18, face = "bold")
+  )
+
+# Affichage de la figure combinée
+combined_plot
+
+```
+
+![Combined plot (Figure S3 in manuscript)](files/figures/plot_17.png)
 
 ## Mask and remove *Aedes aegypti* genome sequences
 
@@ -1232,7 +1624,7 @@ p5 <- ggplot(df3, aes(x = replicate, y = bins, fill = t_class)) +
 p5
 ```
 
-![Number of bins by sample and condition](files/figures/plot_11.png)
+![Number of bins by sample and condition](files/figures/plot_18.png)
 
 ```
 # Create dataframe for number of reads by sample and condition
@@ -1271,7 +1663,7 @@ p6 <- ggplot(df_test, aes(x = replicate, y = genome_reads)) +
 p6 
 ```
 
-![Number of genome reads by sample and condition](files/figures/plot_12.png)
+![Number of genome reads by sample and condition](files/figures/plot_19.png)
 
 ```
 tag_labels <- c("A", "B")
@@ -1292,7 +1684,7 @@ combined_plot <- (p5 + p6) +
 combined_plot
 ```
 
-![Combined figure (Figure 5 in manuscript)](files/figures/plot_13.png)
+![Combined figure (Figure S5 in manuscript)](files/figures/plot_20.png)
 
 ## Phylogenomics
 
@@ -1459,4 +1851,4 @@ anvi-interactive -p phylogenomic-profile-Sphingomonas.db \
 conda deactivate
 ```
 
-![Example: Cutibacterium phylogenomics tree](files/figures/plot_14.png)
+![Example: Cutibacterium phylogenomics tree](files/figures/plot_21.png)

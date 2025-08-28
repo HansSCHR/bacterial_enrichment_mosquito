@@ -1,0 +1,10 @@
+sample	r1	r2
+Aeae_mg_1_1_5	1-1_5_midgut_Aedes_aegypti_S1_R1_001.fastq.gz	1-1_5_midgut_Aedes_aegypti_S1_R2_001.fastq.gz
+Aeae_mg_1_2_5	1-2_5_midgut_Aedes_aegypti_S2_R1_001.fastq.gz	1-2_5_midgut_Aedes_aegypti_S2_R2_001.fastq.gz
+Aeae_mg_1_3_5	1-3_5_midgut_Aedes_aegypti_S3_R1_001.fastq.gz	1-3_5_midgut_Aedes_aegypti_S3_R2_001.fastq.gz
+Aeae_mg_2_1_5	2-1_5_midgut_Aedes_aegypti_S4_R1_001.fastq.gz	2-1_5_midgut_Aedes_aegypti_S4_R2_001.fastq.gz
+Aeae_mg_2_2_5	2-2_5_midgut_Aedes_aegypti_S5_R1_001.fastq.gz	2-2_5_midgut_Aedes_aegypti_S5_R2_001.fastq.gz
+Aeae_mg_2_3_5	2-3_5_midgut_Aedes_aegypti_S6_R1_001.fastq.gz	2-3_5_midgut_Aedes_aegypti_S6_R2_001.fastq.gz
+Aeae_mg_5_1_5	5-1_5_midgut_Aedes_aegypti_S7_R1_001.fastq.gz	5-1_5_midgut_Aedes_aegypti_S7_R2_001.fastq.gz
+Aeae_mg_5_2_5	5-2_5_midgut_Aedes_aegypti_S8_R1_001.fastq.gz	5-2_5_midgut_Aedes_aegypti_S8_R2_001.fastq.gz
+Aeae_mg_5_3_5	5-3_5_midgut_Aedes_aegypti_S9_R1_001.fastq.gz	5-3_5_midgut_Aedes_aegypti_S9_R2_001.fastq.gz
