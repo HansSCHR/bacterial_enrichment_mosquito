@@ -1,4 +1,4 @@
-This project describes the bioinformatic reproductible workflow related to the paper "Distinct bacterial enrichment procedures differential improve mosquito midgut microbiota analyses".
+This project describes the bioinformatic reproductible workflow related to the paper "Filtration- and lysis-based bacterial enrichment procedures differentially improve mosquito midgut microbiota analyses".
 
 # Download metagenomes
 
@@ -63,6 +63,7 @@ anvi-run-workflow -w metagenomics \
 ```
 
 [samples_minoche.txt](files/samples_minoche.txt)
+
 [config_minoche.json](files/config_minoche.json)
 
 
@@ -439,7 +440,7 @@ combined_plot <- (p1b + p_box) +
 combined_plot
 ```
 
-![Combined plot (Figure 1 in manuscript)](files/figures/plot_5.png)
+![Combined plot (Figure 1 in manuscript)](files/figures/plot_5.jpg)
 
 
 ```
