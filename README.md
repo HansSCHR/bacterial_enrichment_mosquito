@@ -1079,11 +1079,11 @@ melt_intersect$variable <- factor(
 )
 
 custom_cols <- c(
-  "Shared by all"        = "#4575b4",  # bleu
-  "Only Microbiome"      = "#984ea3",  # violet
-  "Microbiome + DNeasy F"= "#4daf4a",  # vert
-  "Only DNeasy F"        = "#ff7f00",  # orange
-  "Other"                = "grey70"    # gris
+  "Shared by all"        = "#4575b4",
+  "Only Microbiome"      = "#984ea3",
+  "Microbiome + DNeasy F"= "#4daf4a",
+  "Only DNeasy F"        = "#ff7f00",
+  "Other"                = "grey70"
 )
 
 gg1 <- ggplot(melt_intersect, aes(x = Method, y = value, fill = variable)) +
@@ -1229,9 +1229,9 @@ pA <- wrap_elements(pupset2)
 
 #/ gg3_styled
                 
-# Combinaison des graphiques avec légende fusionnée en bas
+# Combine plots
 combined_plot <- (pA / (gg1 + gg2_styled)) + 
-  #plot_layout(ncol = 1, widths = c(2, 1)) +  # adjuster ajustée
+  #plot_layout(ncol = 1, widths = c(2, 1)) +
   plot_layout(heights = c(2, 1)) +
   plot_annotation(title = "", tag_levels = list(tag_labels), tag_suffix = ".") & 
   theme(
@@ -1242,7 +1242,7 @@ combined_plot <- (pA / (gg1 + gg2_styled)) +
     plot.tag = element_text(size = 18, face = "bold")
   )
 
-# Affichage de la figure combinée
+# Print combined plot
 combined_plot
 
 ```
@@ -1352,6 +1352,7 @@ Briefly, the anvi'o metagenomics workflow includes the following steps:
 We used the following config files and this anvi'o command to run the workflow: 
 
 [config_spades_noAedes.json](files/config_spades_noAedes.json)
+
 [samples_noAedes.txt](files/samples_noAedes.txt)
 
 ```
