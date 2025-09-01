@@ -4,18 +4,19 @@ This project describes the bioinformatic reproductible workflow related to the p
 
 We analyzed 9 samples of pooled midguts from *Aedes aegypti* females (Paea strain) reported here:
 
-|Sequencing name| Sample name       | Species          | Organ              | R1                                            | R2                                             | Read ENA accession |
-|:-------------:|:-----------------:|:----------------:|:------------------:|:---------------------------------------------:|:---------------------------------------------:|:------------------:|
-| Aeae_mg_1_1_5 | DNeasy NF-R1      | *Aedes aegypti*  | MIDGUT (pool of 5) | 1-1_5_midgut_Aedes_aegypti_S1_R1_001.fastq.gz | 1-1_5_midgut_Aedes_aegypti_S1_R2_001.fastq.gz |                    |
-| Aeae_mg_1_2_5 | DNeasy NF-R2      | *Aedes aegypti*  | MIDGUT (pool of 5) | 1-2_5_midgut_Aedes_aegypti_S2_R1_001.fastq.gz | 1-2_5_midgut_Aedes_aegypti_S2_R2_001.fastq.gz |                    |
-| Aeae_mg_1_3_5 | DNeasy NF-R3      | *Aedes aegypti*  | MIDGUT (pool of 5) | 1-3_5_midgut_Aedes_aegypti_S3_R1_001.fastq.gz | 1-3_5_midgut_Aedes_aegypti_S3_R2_001.fastq.gz |                    |
-| Aeae_mg_2_1_5 | DNeasy F-R1       | *Aedes aegypti*  | MIDGUT (pool of 5) | 2-1_5_midgut_Aedes_aegypti_S4_R1_001.fastq.gz | 2-1_5_midgut_Aedes_aegypti_S4_R2_001.fastq.gz |                    |
-| Aeae_mg_2_2_5 | DNeasy F-R2       | *Aedes aegypti*  | MIDGUT (pool of 5) | 2-2_5_midgut_Aedes_aegypti_S5_R1_001.fastq.gz | 2-2_5_midgut_Aedes_aegypti_S5_R2_001.fastq.gz |                    |
-| Aeae_mg_2_3_5 | DNeasy F-R3       | *Aedes aegypti*  | MIDGUT (pool of 5) | 2-3_5_midgut_Aedes_aegypti_S6_R1_001.fastq.gz | 2-3_5_midgut_Aedes_aegypti_S6_R2_001.fastq.gz |                    |
-| Aeae_mg_5_1_5 | Microbiome kit-R1 | *Aedes aegypti*  | MIDGUT (pool of 5) | 5-1_5_midgut_Aedes_aegypti_S7_R1_001.fastq.gz | 5-1_5_midgut_Aedes_aegypti_S7_R2_001.fastq.gz |                    |
-| Aeae_mg_5_2_5 | Microbiome kit-R2 | *Aedes aegypti*  | MIDGUT (pool of 5) | 5-2_5_midgut_Aedes_aegypti_S8_R1_001.fastq.gz | 5-2_5_midgut_Aedes_aegypti_S8_R2_001.fastq.gz |                    |
-| Aeae_mg_5_3_5 | Microbiome kit-R3 | *Aedes aegypti*  | MIDGUT (pool of 5) | 5-3_5_midgut_Aedes_aegypti_S9_R1_001.fastq.gz | 5-3_5_midgut_Aedes_aegypti_S9_R2_001.fastq.gz |                    |
+|Sequencing name| Sample name       | Species          | Organ              | R1                                            | R2                                            | Study accession number (ENA) | Read accession number (ENA) |
+|:-------------:|:-----------------:|:----------------:|:------------------:|:---------------------------------------------:|:---------------------------------------------:|:----------------------------:|:---------------------------:|
+| Aeae_mg_1_1_5 | DNeasy NF-R1      | *Aedes aegypti*  | MIDGUT (pool of 5) | 1-1_5_midgut_Aedes_aegypti_S1_R1_001.fastq.gz | 1-1_5_midgut_Aedes_aegypti_S1_R2_001.fastq.gz | PRJEB96753                   | ERR15500130                 |
+| Aeae_mg_1_2_5 | DNeasy NF-R2      | *Aedes aegypti*  | MIDGUT (pool of 5) | 1-2_5_midgut_Aedes_aegypti_S2_R1_001.fastq.gz | 1-2_5_midgut_Aedes_aegypti_S2_R2_001.fastq.gz | PRJEB96753                   | ERR15500131                 |
+| Aeae_mg_1_3_5 | DNeasy NF-R3      | *Aedes aegypti*  | MIDGUT (pool of 5) | 1-3_5_midgut_Aedes_aegypti_S3_R1_001.fastq.gz | 1-3_5_midgut_Aedes_aegypti_S3_R2_001.fastq.gz | PRJEB96753                   | ERR15500132                 |
+| Aeae_mg_2_1_5 | DNeasy F-R1       | *Aedes aegypti*  | MIDGUT (pool of 5) | 2-1_5_midgut_Aedes_aegypti_S4_R1_001.fastq.gz | 2-1_5_midgut_Aedes_aegypti_S4_R2_001.fastq.gz | PRJEB96753                   | ERR15500133                 |
+| Aeae_mg_2_2_5 | DNeasy F-R2       | *Aedes aegypti*  | MIDGUT (pool of 5) | 2-2_5_midgut_Aedes_aegypti_S5_R1_001.fastq.gz | 2-2_5_midgut_Aedes_aegypti_S5_R2_001.fastq.gz | PRJEB96753                   | ERR15500134                 |
+| Aeae_mg_2_3_5 | DNeasy F-R3       | *Aedes aegypti*  | MIDGUT (pool of 5) | 2-3_5_midgut_Aedes_aegypti_S6_R1_001.fastq.gz | 2-3_5_midgut_Aedes_aegypti_S6_R2_001.fastq.gz | PRJEB96753                   | ERR15500135                 |
+| Aeae_mg_5_1_5 | Microbiome kit-R1 | *Aedes aegypti*  | MIDGUT (pool of 5) | 5-1_5_midgut_Aedes_aegypti_S7_R1_001.fastq.gz | 5-1_5_midgut_Aedes_aegypti_S7_R2_001.fastq.gz | PRJEB96753                   | ERR15500136                 |
+| Aeae_mg_5_2_5 | Microbiome kit-R2 | *Aedes aegypti*  | MIDGUT (pool of 5) | 5-2_5_midgut_Aedes_aegypti_S8_R1_001.fastq.gz | 5-2_5_midgut_Aedes_aegypti_S8_R2_001.fastq.gz | PRJEB96753                   | ERR15500137                 |
+| Aeae_mg_5_3_5 | Microbiome kit-R3 | *Aedes aegypti*  | MIDGUT (pool of 5) | 5-3_5_midgut_Aedes_aegypti_S9_R1_001.fastq.gz | 5-3_5_midgut_Aedes_aegypti_S9_R2_001.fastq.gz | PRJEB96753                   | ERR15500138                 |
 
+Raw sequences can be accessed in the Europe Nucleotide Archive database (ENA): Study accession number **PRJEB96753**. 
 
 # Process data
 
