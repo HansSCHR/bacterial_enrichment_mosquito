@@ -2,6 +2,8 @@ This project describes the bioinformatic reproductible workflow related to the p
 
 # Download metagenomes
 
+Raw sequences can be accessed in the Europe Nucleotide Archive database (ENA): Study accession number **PRJEB96753**. 
+
 We analyzed 9 samples of pooled midguts from *Aedes aegypti* females (Paea strain) reported here:
 
 |Sequencing name| Sample name       | Species          | Organ              | R1                                            | R2                                            | Study accession number (ENA) | Read accession number (ENA) |
@@ -16,7 +18,6 @@ We analyzed 9 samples of pooled midguts from *Aedes aegypti* females (Paea strai
 | Aeae_mg_5_2_5 | Microbiome kit-R2 | *Aedes aegypti*  | MIDGUT (pool of 5) | 5-2_5_midgut_Aedes_aegypti_S8_R1_001.fastq.gz | 5-2_5_midgut_Aedes_aegypti_S8_R2_001.fastq.gz | PRJEB96753                   | ERR15500137                 |
 | Aeae_mg_5_3_5 | Microbiome kit-R3 | *Aedes aegypti*  | MIDGUT (pool of 5) | 5-3_5_midgut_Aedes_aegypti_S9_R1_001.fastq.gz | 5-3_5_midgut_Aedes_aegypti_S9_R2_001.fastq.gz | PRJEB96753                   | ERR15500138                 |
 
-Raw sequences can be accessed in the Europe Nucleotide Archive database (ENA): Study accession number **PRJEB96753**. 
 
 # Process data
 
