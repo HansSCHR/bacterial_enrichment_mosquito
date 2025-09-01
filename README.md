@@ -1,4 +1,4 @@
-This project describes the bioinformatic reproductible workflow related to the paper "Filtration- and lysis-based bacterial enrichment procedures differentially improve mosquito midgut microbiota analyses".
+This project describes the bioinformatic reproductible workflow related to the paper "**Filtration- and lysis-based bacterial enrichment procedures differentially improve mosquito midgut microbiota analyses**".
 
 # Download metagenomes
 
