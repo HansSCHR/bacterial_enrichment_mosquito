@@ -1,8 +1,8 @@
-This project describes the bioinformatic reproductible workflow related to the paper "**Filtration- and lysis-based bacterial enrichment procedures differentially improve mosquito midgut microbiota analyses**".
+This project describes the bioinformatics reproducible workflow related to the paper "**Filtration- and lysis-based bacterial enrichment procedures differentially improve mosquito midgut microbiota analyses**".
 
 # Download metagenomes
 
-Raw sequences can be accessed in the Europe Nucleotide Archive database (ENA): Study accession number **PRJEB96753**. 
+Raw sequences can be accessed in the European Nucleotide Archive database (ENA): Study accession number **PRJEB96753**. 
 
 We analyzed 9 samples of pooled midguts from *Aedes aegypti* females (Paea strain) reported here:
 
@@ -21,7 +21,7 @@ We analyzed 9 samples of pooled midguts from *Aedes aegypti* females (Paea strai
 
 # Process data
 
-## Adaptor trimming
+## Adapter trimming
 
 We removed adapters using the following adapters and code:
 
@@ -46,7 +46,7 @@ do
 # run bbduk
 bbduk.sh  in1=$r1 in2=$r2 \
           out1=bbduk/$r1t out2=bbduk/$r2t \
-          ref=adapters-reduced.fa \
+          ref=adapters.fa \
           stats=bbduk/"$NAME"_stats.txt \
           ktrim=r k=19 mink=9 hdist=1 tpe tbo 
 
@@ -73,7 +73,7 @@ anvi-run-workflow -w metagenomics \
 
 ### Run phyloFlash
 
-We used phyloflash based on SSU rRNA sequences to make taxonomic profile in our samples using this command:
+We used phyloFlash based on SSU rRNA sequences to make taxonomic profile in our samples using this command:
 
 ```
 for r1 in $DWK/01_DATA/*_R1_trimmed.fastq.gz
@@ -269,7 +269,7 @@ p1b
 
 #### Pie charts 
 
-We generate pie charts of mapped and unmapped eukaryotic SSU rRNA reads to Aedes aegypti reference genome following these commands: 
+We generated pie charts of mapped and unmapped eukaryotic SSU rRNA reads to Aedes aegypti reference genome following these commands: 
 
 ```
 # Create dataframe for pie charts
@@ -286,17 +286,17 @@ pie_colors <- c("Mapped_Percentage" = "#CF685D", "Unmapped_Percentage" = "grey")
 
 # Invert replicates order
 pie_data <- pie_data %>%
-  mutate(Replicate = factor(Replicate, levels = c("R3", "R2", "R1")))  # Inversion de l'ordre des réplicats
+  mutate(Replicate = factor(Replicate, levels = c("R3", "R2", "R1")))
 
 # Change methods order
 pie_data <- pie_data %>%
-  mutate(Method = factor(Method, levels = c("DNEasy NF", "DNEasy F", "Microbiome kit")))
+  mutate(Method = factor(Method, levels = c("DNeasy NF", "DNeasy F", "Microbiome kit")))
 
 # Generate pie charts
 p2 <- ggplot(pie_data, aes(x = "", y = Percentage, fill = Category)) +
   geom_col(width = 1, color = "white") +
   coord_polar("y", start = 0) +
-  facet_grid(Replicate ~ Method) +  # Alignement selon la méthode et le replicat
+  facet_grid(Replicate ~ Method) +
   scale_fill_manual(values = pie_colors,  
                     labels = c("Mapped to Aedes aegypti genome", 
                                "Unmapped to Aedes aegypti genome")) +
@@ -331,7 +331,7 @@ p2
 # Data from plot 1
 df_p1 <- p1$data
 
-# Keep only Eukaryota
+# Keep only Bacteria
 df_bac <- df_p1 %>%
   filter(Domain == "Bacteria")
 
@@ -376,7 +376,7 @@ df_tukey <- df_tukey %>%
     p_value < 0.001 ~ "***",
     p_value < 0.01 ~ "**",
     p_value < 0.05 ~ "*",
-    TRUE ~ "ns"  # Pas significatif
+    TRUE ~ "ns"
   ))
 
 # Reformat names from tukey results
@@ -427,7 +427,7 @@ tag_labels <- c("A", "B")
                 
 # Combine plots and legends
 combined_plot <- (p1b + p_box) +
-  plot_layout(ncol = 2, widths = c(2, 1)) +  # Largeur ajustée
+  plot_layout(ncol = 2, widths = c(2, 1)) +
   #plot_layout(heights = c(1, 1)) +
   plot_annotation(title = "", tag_levels = list(tag_labels), tag_suffix = ".") & 
   theme(
@@ -452,7 +452,7 @@ tag_labels <- c("A", "B")
                 
 # Combine plots and legends
   combined_plot2 <- (p1 + p2) +
-  plot_layout(ncol = 2, widths = c(2, 1)) +  # Largeur ajustée
+  plot_layout(ncol = 2, widths = c(2, 1)) +
   #plot_layout(heights = c(1, 1)) +
   plot_annotation(title = "", tag_levels = list(tag_labels), tag_suffix = ".") & 
   theme(
@@ -664,7 +664,7 @@ require(patchwork)
 
 # Combine plots with legends
 combined_plot <- (nb_reads + nb_phylo) + 
-  plot_layout(ncol = 2, widths = c(1, 1)) +  # Largeur ajustée
+  plot_layout(ncol = 2, widths = c(1, 1)) +
   plot_annotation(title = "", tag_levels = "A", tag_suffix = ".") & 
   theme(
     legend.position = "right",
@@ -720,7 +720,7 @@ df_phy <- data.frame(general_taxo_phy@tax_table[,c(1:2)])
 df_phy$percent <- signif((taxa_sums(general_taxo_phy) * 100 / 9), 3)
 df_phy <- df_phy[order(-df_phy$percent),]
 
-# Leep 17 most abundant
+# Keep 19 most abundant
 phylum_to_keep <- df_phy$Phylum[1:19]
 
 # Keep chosen phyla and group the rest in "Others"
@@ -945,8 +945,8 @@ Response: Distances
 tag_labels <- c("A", "B", "C", "D")
 
 # Combine plots with legends
-combined_plot <- (p3 | (nb_phylo / nb_reads / p4)) + 
-  plot_layout(ncol = 2, widths = c(1, 0.5), heights = c(1, 1, 1)) +  # Largeur ajustée
+combined_plot <- (p | (nb_phylo / nb_reads / p4)) + 
+  plot_layout(ncol = 2, widths = c(1, 0.5), heights = c(1, 1, 1)) +
   #plot_layout(ncol = 2, widths = c(1.8, 1.2), heights = c(1, 1, 1)) +
   plot_annotation(title = "", tag_levels = list(tag_labels), tag_suffix = ".") & 
   theme(
@@ -1176,7 +1176,7 @@ gg2_styled <- ggplot(melt_intersect, aes(x = Method, y = value, fill = variable)
   geom_bar(stat = "identity", position = "stack", width = 0.7) +
   facet_wrap(~ Method, scales = "free", nrow = 1) +
   scale_fill_manual(values = custom_cols, name = NULL) +
-  labs(y = "Number of NTUs reads (%)",   # même label Y
+  labs(y = "Number of NTUs reads (%)",
        x = NULL) +
   theme_classic(base_size = 14) +
   theme(
@@ -1201,7 +1201,7 @@ gg2_styled
 gg3_styled <- ggplot(melt_intersect, aes(x = Method, y = value, fill = variable)) +
   geom_bar(stat = "identity", position = "stack", width = 0.7) +
   scale_fill_manual(values = custom_cols, name = NULL) +
-  labs(y = "Number of NTUs reads (%)",   # même label Y
+  labs(y = "Number of NTUs reads (%)",
        x = NULL) +
   theme_classic(base_size = 14) +
   theme(
@@ -1227,7 +1227,7 @@ library(patchwork)
 
 
 tag_labels <- c("A", "B", "C")
-pA <- wrap_elements(pupset2)
+pA <- wrap_elements(pupset)
 
 #/ gg3_styled
                 
@@ -1253,7 +1253,7 @@ combined_plot
 
 ## Mask and remove *Aedes aegypti* genome sequences
 
-We used BBmask to mask the low-complexity sequences of *Aedes aegypti* genome using the *Aedes aegypti* reference genome AaegL5.0 (NCBI ID: GCF_002204515.2) as reference using this command: 
+We used BBMask to mask the low-complexity sequences of *Aedes aegypti* genome using the *Aedes aegypti* reference genome AaegL5.0 (NCBI ID: GCF_002204515.2) as reference using this command: 
 
 ```
 ref_folder=reference_genome_folder
@@ -1346,9 +1346,9 @@ done
 Briefly, the anvi'o metagenomics workflow includes the following steps: 
 
 1) Assembly of quality-filtered short reads using metaSPAdes.
-2) Taxonomical (GTDB) and functionnal (COG, KOfam) assignment of contigs using anvi'o anvi-scg-taxonomy, anvi-run-kegg-kofams and anvi-run-ncbi-cogs programs
-3) Reads recruitment from all samples (all-against-all) on each sample assembly using Bowtie2.
-4) Profile the BAM files by linking them to the contigs databases using the anvi-profile program. The program computes the coverage by nucleotide position, the variants (at nucleotide, codon and amino-acid levels) and the structural variants (indel or insertions).
+2) Taxonomical (GTDB) and functional (COG, KOfam) assignment of contigs using anvi'o anvi-scg-taxonomy, anvi-run-kegg-kofams and anvi-run-ncbi-cogs programs
+3) Read recruitment from all samples (all-against-all) on each sample assembly using Bowtie2.
+4) Profile the BAM files by linking them to the contigs databases using the anvi-profile program. The program computes the coverage by nucleotide position, the variants (at nucleotide, codon and amino-acid levels) and the structural variants (indels or insertions).
 5) Merge the resulting single anvi'o profile databases.
 
 We used the following config files and this anvi'o command to run the workflow: 
@@ -1361,10 +1361,10 @@ We used the following config files and this anvi'o command to run the workflow:
 anvi-run-workflow -w metagenomics -c config_spades_noAedes.json
 ```
 
-The complete anvi'o metagenomics workflow results on the following folders for each condition: 
-* `00_LOGS`: Log files for each processus
-* `02_FASTA_NO_AEDES`: Megahit assembly of each sample (FASTA files).
-* `03_CONTIGS_NO_AEDES`: Anvi’o contigs databases for each assembly with taxonomic and functionnal annoations
+The complete anvi'o metagenomics workflow results in the following folders for each condition: 
+* `00_LOGS`: Log files for each processes
+* `02_FASTA_NO_AEDES`: metaSPAdes assembly of each sample (FASTA files).
+* `03_CONTIGS_NO_AEDES`: Anvi’o contigs databases for each assembly with taxonomic and functional annotations
 * `04_MAPPING_NO_AEDES`: BAM files from Bowtie2 read recruitment on each assembly (all-against-all)
 * `05_ANVIO_PROFILE_NO_AEDES`: Anvi’o single profiles for each sample
 * `06_MERGED_NO_AEDES`: Anvi’o merged profile databases for each assembly
@@ -1498,7 +1498,7 @@ for sample in Aeae_mg_1_1_5 Aeae_mg_1_2_5 Aeae_mg_1_3_5 Aeae_mg_2_1_5 Aeae_mg_2_
 	done
 ```
 
-## Import completion estimates and taxonoy assignations to anvi'o
+## Import completion estimates and taxonoy assignments to anvi'o
 
 We imported binning from CONCOCT to anvi'o databases using the following commands:
 
@@ -1543,7 +1543,7 @@ for sample in Aeae_mg_1_1_5 Aeae_mg_1_2_5 Aeae_mg_1_3_5 Aeae_mg_2_1_5 Aeae_mg_2_
   done
 ```
 
-Finally, we get 16 MAGs with good completion et low redondancy which are reported here: 
+Finally, we get 16 MAGs with good completion and low redundancy which are reported here: 
 
 | sample           | cond           | bins        | total_length | num_contigs | N50    | GC_content        | percent_completion | percent_redundancy | t_domain | t_phylum         | t_class           | t_order             | t_family             | t_genus       | t_species            |
 |:----------------:|:--------------:|:-----------:|:-------------:|:------------:|:------:|:------------------:|:--------------------:|:--------------------:|:--------:|:-----------------:|:------------------:|:---------------------:|:----------------------:|:-------------:|:---------------------:|
@@ -1575,7 +1575,7 @@ library(dplyr)
 library(stringr)
 
 # Read excel file corresponding to bins table
-file_path <- "/Volumes/Expansion/Travail/These/Emilie/mail_Emilie/Table_S6.xlsx"
+file_path <- "Table_S6.xlsx"
 df <- read_excel(file_path, sheet = "filtered_bins")
 
 # Add replicates column
@@ -1584,7 +1584,7 @@ df$replicate <- c("R1", "R2", "R2", "R1", "R1", "R1", "R1", "R1", "R1", "R2", "R
 # Filter columns of interest
 df <- df %>%
   select(sample, cond, replicate, t_class) %>%
-  filter(!is.na(t_class))  # Supprimer les valeurs NA
+  filter(!is.na(t_class))
 
 # Regroup and count bins by condition and class
 df_summary <- df %>%
@@ -1612,8 +1612,8 @@ color_palette <- c("Actinomycetia" = "grey26",
 # Plot of number of bins by sample and condition
 p5 <- ggplot(df3, aes(x = replicate, y = bins, fill = t_class)) +
   geom_bar(stat = "identity", position = "dodge", color="black") +
-  geom_text(aes(label = bins), vjust = -0.5, size = 5, position=position_dodge(width=0.9)) +  # Ajouter les valeurs au-dessus des barres
-  facet_grid(~cond, scales = "free_x") +  # Séparer par condition
+  geom_text(aes(label = bins), vjust = -0.5, size = 5, position=position_dodge(width=0.9)) +
+  facet_grid(~cond, scales = "free_x") +
   scale_fill_manual(values = color_palette) +
   labs(x = "sample", y = "number of bin", fill = "Class") +
   theme_bw() +
@@ -1652,8 +1652,8 @@ df_test <- df3 %>% merge(df4, by=c("sample", "replicate"))
 # Plot number of genome reads by sample and condition
 p6 <- ggplot(df_test, aes(x = replicate, y = genome_reads)) +
   geom_bar(stat = "identity", position = "dodge", color="black") +
-  geom_text(aes(label = genome_reads), vjust = -0.5, size = 5, position=position_dodge(width=0.9)) +  # Ajouter les valeurs au-dessus des barres
-  facet_grid(~cond, scales = "free_x") +  # Séparer par condition
+  geom_text(aes(label = genome_reads), vjust = -0.5, size = 5, position=position_dodge(width=0.9)) +
+  facet_grid(~cond, scales = "free_x") +
   labs(x = "sample", y = "number of reads without Aedes") +
   theme_bw() +
   theme(axis.text = element_text(size = 12, angle = 0), 
@@ -1674,7 +1674,7 @@ tag_labels <- c("A", "B")
 
 # Combine plots with legends
 combined_plot <- (p5 + p6) +
-  plot_layout(ncol = 1, widths = c(1, 1), heights = c(1, 1)) +  # Largeur ajustée
+  plot_layout(ncol = 1, widths = c(1, 1), heights = c(1, 1)) +
   plot_annotation(title = "", tag_levels = list(tag_labels), tag_suffix = ".") & 
   theme(
     legend.position = "right",
