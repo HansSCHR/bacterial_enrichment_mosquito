@@ -444,7 +444,7 @@ combined_plot <- (p1b + p_box) +
 combined_plot
 ```
 
-![Combined plot (Figure 1 in manuscript)](files/figures/plot_5.jpg)
+![Combined plot (Figure 1 in manuscript)](files/figures/plot_5.png)
 
 
 ```
