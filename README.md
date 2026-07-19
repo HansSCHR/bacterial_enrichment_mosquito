@@ -247,8 +247,7 @@ p1b <- plot_bar(ps_phylo_domain, x = "Replicate", fill = "Domain", facet_grid = 
   geom_col(position = "stack", color="white") +
   labs(x = "Sample", y = "Reads distribution", fill="Domain") +
   scale_fill_manual(values = domain_color) +
-  #geom_text(aes(label = ifelse(signif(Abundance, digits = 3) > 1, signif(Abundance, digits = 3), "")),
-  geom_text(aes(label = ifelse(Abundance > 1, format(Abundance, scientific = FALSE), "")),
+  geom_text(aes(label = ifelse(Abundance > 1, scales::comma(Abundance), "")),
             position = position_stack(vjust = 0.5),
             color="black", size=4) +
   theme_bw() +
@@ -1620,7 +1619,7 @@ p5 <- ggplot(df3, aes(x = replicate, y = bins, fill = t_class)) +
   theme(axis.text = element_text(size = 12, angle = 0), 
         axis.title = element_text(size = 14), 
         strip.text = element_text(face = "bold", size = 14), 
-        legend.text = element_text(size = 12), 
+        legend.text = element_text(size = 12, face = "italic"),
         legend.title = element_text(size = 14)) +
   ylim(0,4.5)
 
@@ -1652,7 +1651,7 @@ df_test <- df3 %>% merge(df4, by=c("sample", "replicate"))
 # Plot number of genome reads by sample and condition
 p6 <- ggplot(df_test, aes(x = replicate, y = genome_reads)) +
   geom_bar(stat = "identity", position = "dodge", color="black") +
-  geom_text(aes(label = genome_reads), vjust = -0.5, size = 5, position=position_dodge(width=0.9)) +
+  geom_text(aes(label = format(genome_reads, decimal.mark = ".", big.mark = ",")), vjust = -0.5, size = 5, position=position_dodge(width=0.9)) +
   facet_grid(~cond, scales = "free_x") +
   labs(x = "sample", y = "number of reads without Aedes") +
   theme_bw() +
