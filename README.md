@@ -219,7 +219,10 @@ p1 <- plot_bar(ps_phylo_rel_domain, x = "Replicate", fill = "Domain", facet_grid
   theme_bw() +
   theme(axis.text = element_text(size = 12, angle = 0), 
         axis.title = element_text(size = 14), 
-        strip.text = element_text(face = "bold", size = 14)) +
+        strip.text = element_text(face = "bold", size = 14),
+        legend.title      = element_text(size = 14),
+        legend.text       = element_text(size = 12, face = "italic"),
+        legend.key.size   = unit(1.2, "lines")) +
   coord_flip()
 
 # Display relative abundance plot
@@ -256,7 +259,7 @@ p1b <- plot_bar(ps_phylo_domain, x = "Replicate", fill = "Domain", facet_grid = 
         axis.title = element_text(size = 14), 
         strip.text = element_text(face = "bold", size = 14),
         legend.title      = element_text(size = 14),
-        legend.text       = element_text(size = 12),
+        legend.text       = element_text(size = 12, face ="italic"),
         legend.key.size   = unit(1.2, "lines")) +
   coord_flip()
 
@@ -748,7 +751,7 @@ p <- plot_bar(ps_phylo_prok_rel, x = "Replicate", fill = "Phylum", facet_grid = 
   theme(axis.text = element_text(size = 12, angle = 0), 
         axis.title = element_text(size = 14), 
         strip.text = element_text(face = "bold", size = 14), 
-        legend.text = element_text(size = 12), 
+        legend.text = element_text(size = 12, face ="italic"), 
         legend.title = element_text(size = 14)) 
 
 # Display plot
@@ -823,7 +826,7 @@ p3_count <- plot_bar(ps_phylo_prok_rel, x = "Replicate", fill = "Phylum", facet_
   theme(axis.text = element_text(size = 12, angle = 0), 
         axis.title = element_text(size = 14), 
         strip.text = element_text(face = "bold", size = 14), 
-        legend.text = element_text(size = 12), 
+        legend.text = element_text(size = 12, face = "italic"), 
         legend.title = element_text(size = 14)) 
 p3_count
 ```
