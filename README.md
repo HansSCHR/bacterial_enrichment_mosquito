@@ -948,8 +948,6 @@ Response: Distances
 
 #### Differential abundance analysis
 
-#### Differential abundance analysis
-
 ```
 # Load packages
 require(phyloseq)
