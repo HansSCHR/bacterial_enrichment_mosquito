@@ -704,7 +704,8 @@ taxo[Class=="Alphaproteobacteria", Phylum:="Proteobac.: Alphaproteobacteria"]
 taxo[Class=="Gammaproteobacteria", Phylum:="Proteobac.: Gammaproteobacteria"]
 taxo[Class=="Zetaproteobacteria", Phylum:="Proteobac.: Zetaproteobacteria"]
 taxo[Class=="Magnetococcia", Phylum:="Proteobac.: Magnetococcia"]
-taxo[Phylum=="Proteobacteria" & is.na(Class), Phylum:="Unassigned Proteobacteria"]
+# taxo[Phylum=="Proteobacteria" & is.na(Class), Phylum:="Unassigned Proteobacteria"]
+taxo[Phylum=="Proteobacteria", Phylum:="Unassigned Proteobacteria"]
 taxo[Class=="Bathyarchaeia", Phylum:="Crenarchaeota: Bathyarchaeia"]
 taxo[Class=="Nitrososphaeria", Phylum:="Crenarchaeota: Nitrososphaeria"]
 taxo[Phylum=="Crenarchaeota", Phylum:="Crenarchaeota (NA)"]
@@ -779,7 +780,8 @@ taxo[Class=="Alphaproteobacteria", Phylum:="Proteobac.: Alphaproteobacteria"]
 taxo[Class=="Gammaproteobacteria", Phylum:="Proteobac.: Gammaproteobacteria"]
 taxo[Class=="Zetaproteobacteria", Phylum:="Proteobac.: Zetaproteobacteria"]
 taxo[Class=="Magnetococcia", Phylum:="Proteobac.: Magnetococcia"]
-taxo[Phylum=="Proteobacteria" & is.na(Class), Phylum:="Unassigned Proteobacteria"]
+# taxo[Phylum=="Proteobacteria" & is.na(Class), Phylum:="Unassigned Proteobacteria"]
+taxo[Phylum=="Proteobacteria", Phylum:="Unassigned Proteobacteria"]
 taxo[Class=="Bathyarchaeia", Phylum:="Crenarchaeota: Bathyarchaeia"]
 taxo[Class=="Nitrososphaeria", Phylum:="Crenarchaeota: Nitrososphaeria"]
 taxo[Phylum=="Crenarchaeota", Phylum:="Crenarchaeota (NA)"]
@@ -842,12 +844,14 @@ require(vegan)
 require(phyloseq)
 
 # Create Bray-Curtis matrix
-bray_dist <- phyloseq::distance(ps_phylo_prok_rel, method = "bray")
+ps_rel     <- transform_sample_counts(ps_phylo_prok_rel, function(x) x / sum(x) * 100)
+bray_dist  <- phyloseq::distance(ps_rel, method = "bray")
 
 # Check matrix structure
 bray_dist
 
 # Compute NMDS
+set.seed(123)
 nmds <- metaMDS(bray_dist, k = 2, trymax = 100)
 
 # Extract NMDS coordinates
@@ -941,6 +945,104 @@ Response: Distances
 | Groups    |  2 | 0.008567 | 0.004284 | 0.7256  |   999  | 0.532  |
 | Residuals |  6 | 0.035419 | 0.005903 |         |        |        |
 
+
+#### Differential abundance analysis
+
+#### Differential abundance analysis
+
+```
+# Load packages
+require(phyloseq)
+require(data.table)
+require(DESeq2)
+require(ALDEx2)
+require(openxlsx)
+
+# Same taxonomy resolution as the composition plots: keep the Proteobacteria classes
+# separate, and pool everything that stays unresolved into one "Unassigned bacteria" group
+taxo <- data.frame(ps_phylo_prok@tax_table)
+taxo <- as.data.table(taxo)
+taxo[Class == "Alphaproteobacteria", Phylum := "Proteobac.: Alphaproteobacteria"]
+taxo[Class == "Gammaproteobacteria", Phylum := "Proteobac.: Gammaproteobacteria"]
+taxo[Class == "Zetaproteobacteria",  Phylum := "Proteobac.: Zetaproteobacteria"]
+taxo[Class == "Magnetococcia",       Phylum := "Proteobac.: Magnetococcia"]
+taxo[Phylum == "Proteobacteria", Phylum := "Unassigned bacteria"]
+taxo[Phylum == "(Bacteria)",     Phylum := "Unassigned bacteria"]
+taxo <- as.matrix(taxo)
+rownames(taxo) <- taxa_names(ps_phylo_prok)
+
+# Rebuild the object and glom to phylum level
+ps_da <- phyloseq(otu_table(ps_phylo_prok), tax_table(taxo), sample_data(ps_phylo_prok))
+ps_da <- tax_glom(ps_da, taxrank = "Phylum", NArm = FALSE)
+
+# Count matrix (taxa in rows) and the grouping variable
+counts <- as(otu_table(ps_da), "matrix")
+if (!taxa_are_rows(ps_da)) counts <- t(counts)
+rownames(counts) <- as.character(tax_table(ps_da)[, "Phylum"])
+method <- as.character(sample_data(ps_da)$Method)
+
+# Keep the phyla with a bit of signal (>= 50 reads and present in >= 3 samples),
+# but always keep "Unassigned bacteria" so it still works as the denominator
+keep <- (rowSums(counts) >= 50 & rowSums(counts > 0) >= 3) | rownames(counts) == "Unassigned bacteria"
+counts <- counts[keep, ]
+
+# The three pairwise comparisons, written as "method A vs method B"
+comparisons <- list(
+  c("DNeasy F",       "Microbiome kit"),
+  c("DNeasy F",       "DNeasy NF"),
+  c("Microbiome kit", "DNeasy NF")
+)
+
+# ---- DESeq2 ----
+# For "A vs B", a positive log2FoldChange means the taxon is more abundant in method A
+coldata <- data.frame(row.names = colnames(counts), Method = factor(method))
+dds <- DESeqDataSetFromMatrix(counts, coldata, ~ Method)
+dds <- DESeq(estimateSizeFactors(dds, type = "poscounts"))
+
+deseq_res <- data.table()
+for (cmp in comparisons) {
+  a <- cmp[1]
+  b <- cmp[2]
+  res <- results(dds, contrast = c("Method", a, b))
+  res <- as.data.table(as.data.frame(res), keep.rownames = "Taxon")
+  res[, Comparison := paste(a, "vs", b)]
+  deseq_res <- rbind(deseq_res, res, fill = TRUE)
+}
+fwrite(deseq_res, "DA_results_DESeq2.csv")
+
+# ---- ALDEx2 (compositional cross-check) ----
+set.seed(123)   # ALDEx2 uses Monte-Carlo sampling, so fix the seed for reproducibility
+
+aldex_res <- data.table()
+for (cmp in comparisons) {
+  a <- cmp[1]
+  b <- cmp[2]
+  sel <- method %in% c(a, b)
+  x <- aldex(round(counts[, sel]), method[sel], test = "t", effect = TRUE, denom = "all")
+
+  # ALDEx2 doesn't know which method we call "A", so we set the sign ourselves from the
+  # per-group median abundances: positive = more abundant in method A (like DESeq2)
+  higher_in_A <- x[[paste0("rab.win.", a)]] >= x[[paste0("rab.win.", b)]]
+  direction   <- ifelse(higher_in_A, 1, -1)
+  x$effect    <- abs(x$effect)   * direction
+  x$diff.btw  <- abs(x$diff.btw) * direction
+
+  x <- as.data.table(x, keep.rownames = "Taxon")
+  x[, Comparison := paste(a, "vs", b)]
+  aldex_res <- rbind(aldex_res, x, fill = TRUE)
+}
+fwrite(aldex_res, "DA_results_ALDEx2.csv")
+
+# ---- Assemble Table S6 ----
+# padj (ALDEx2) is we.eBH: Welch's t-test, Benjamini-Hochberg corrected
+tableS6 <- merge(
+  deseq_res[, .(Comparison, Taxon, `log2FC (DESeq2)` = log2FoldChange, `padj (DESeq2)` = padj)],
+  aldex_res[, .(Comparison, Taxon, `Effect size (ALDEx2)` = effect, `padj (ALDEx2)` = we.eBH)],
+  by = c("Comparison", "Taxon"), sort = FALSE
+)
+write.xlsx(tableS6, "files/tables/Table_S6.xlsx", overwrite = TRUE)
+```
+       
 #### Merge of plots
 
 ```
@@ -1577,7 +1679,7 @@ library(dplyr)
 library(stringr)
 
 # Read excel file corresponding to bins table
-file_path <- "Table_S6.xlsx"
+file_path <- "files/tables/Table_S7.xlsx"
 df <- read_excel(file_path, sheet = "filtered_bins")
 
 # Add replicates column
