@@ -1,4 +1,4 @@
-This project describes the bioinformatics reproducible workflow related to the paper "**Filtration- and lysis-based bacterial enrichment procedures differentially improve mosquito midgut microbiota analyses**".
+This project describes the bioinformatics reproducible workflow related to the paper "**Optimizing bacterial enrichment procedures to improve mosquito midgut microbiome research **".
 
 # Download metagenomes
 
@@ -444,7 +444,7 @@ combined_plot <- (p1b + p_box) +
 combined_plot
 ```
 
-![Combined plot (Figure 1 in manuscript)](files/figures/plot_5.png)
+![Combined plot (Figure 2 in manuscript)](files/figures/plot_5.png)
 
 
 ```
@@ -726,6 +726,11 @@ df_phy <- df_phy[order(-df_phy$percent),]
 # Keep 19 most abundant
 phylum_to_keep <- df_phy$Phylum[1:19]
 
+# Fix the taxon set and the colour map once, so Figure S2A and Figure S3
+# display the same phyla with the same colours
+phylum_levels <- sort(c(phylum_to_keep, "Others"))
+names(scale_taxon) <- phylum_levels
+
 # Keep chosen phyla and group the rest in "Others"
 taxo <- as.data.table(taxo)
 taxo$Phylum[(taxo$Phylum %in% phylum_to_keep) == FALSE] <- "Others"
@@ -746,8 +751,8 @@ ps_phylo_prok_rel@sam_data$Method <- factor(ps_phylo_prok_rel@sam_data$Method,
 p <- plot_bar(ps_phylo_prok_rel, x = "Replicate", fill = "Phylum", facet_grid = ~Method) + 
   geom_col(aes(color = Phylum), position = "stack") +
   labs(x = "Sample", y = "Reads distribution (%)", fill="Phylum") +
-  scale_color_manual(values = scale_taxon) +
-  scale_fill_manual(values = scale_taxon) +
+  scale_color_manual(values = scale_taxon, limits = phylum_levels, drop = FALSE) +
+  scale_fill_manual(values = scale_taxon, limits = phylum_levels, drop = FALSE) +
   theme_bw() +
   theme(axis.text = element_text(size = 12, angle = 0), 
         axis.title = element_text(size = 14), 
@@ -799,9 +804,6 @@ df_phy <- data.frame(general_taxo_phy@tax_table[,c(1:2)])
 df_phy$percent <- signif((taxa_sums(general_taxo_phy) * 100 / 9), 3)
 df_phy <- df_phy[order(-df_phy$percent),]
 
-# # keep 17 most abundant
-phylum_to_keep <- df_phy$Phylum[1:19]
-
 # # keep chosen phyla and group the rest in "Others"
 taxo <- as.data.table(taxo)
 taxo$Phylum[(taxo$Phylum %in% phylum_to_keep) == FALSE] <- "Others"
@@ -822,8 +824,8 @@ ps_phylo_prok_rel@sam_data$Method <- factor(ps_phylo_prok_rel@sam_data$Method,
 p3_count <- plot_bar(ps_phylo_prok_rel, x = "Replicate", fill = "Phylum", facet_grid = ~Method) + 
   geom_col(aes(color = Phylum), position = "stack") +
   labs(x = "Sample", y = "Reads distribution (count)", fill="Phylum") +
-  scale_color_manual(values = scale_taxon) +
-  scale_fill_manual(values = scale_taxon) +
+scale_color_manual(values = scale_taxon, limits = phylum_levels, drop = FALSE) +
+  scale_fill_manual(values = scale_taxon, limits = phylum_levels, drop = FALSE) +
   theme_bw() +
   theme(axis.text = element_text(size = 12, angle = 0), 
         axis.title = element_text(size = 14), 
@@ -911,7 +913,7 @@ adonis2(formula = bray_dist ~ Method, data = as(sample_data(ps_phylo_prok_rel), 
 
 | Term     | Df | SumOfSqs |    R2    |    F    | Pr(>F) |
 |----------|----|----------|----------|---------|--------|
-| Model    |  2 |  0.75235 | 0.89214  | 24.813  | 0.003  |
+| Model    |  2 |  0.75267 | 0.89194  | 24.763  | 0.001  |
 | Residual |  6 |  0.09096 | 0.10786  |         |        |
 | Total    |  8 |  0.84331 | 1.00000  |         |        |
 
@@ -926,7 +928,7 @@ adonis2(formula = bray_dist ~ Total_Reads, data = as(sample_data(ps_phylo_prok_r
 
 | Term     | Df | SumOfSqs |    R2    |    F    | Pr(>F) |
 |----------|----|----------|----------|---------|--------|
-| Model    |  1 |  0.10700 | 0.12688  | 1.0173  | 0.368  |
+| Model    |  1 |  0.10723 | 0.12707  | 1.0190  | 0.355  |
 | Residual |  7 |  0.73631 | 0.87312  |         |        |
 | Total    |  8 |  0.84331 | 1.00000  |         |        |
 
@@ -942,7 +944,7 @@ Response: Distances
 
 | Term      | Df |  Sum Sq  | Mean Sq  |    F    | N.Perm | Pr(>F) |
 |-----------|----|----------|----------|---------|--------|--------|
-| Groups    |  2 | 0.008567 | 0.004284 | 0.7256  |   999  | 0.532  |
+| Groups    |  2 | 0.008544 | 0.004272 | 0.7226  |   999  | 0.536  |
 | Residuals |  6 | 0.035419 | 0.005903 |         |        |        |
 
 
@@ -1063,7 +1065,7 @@ combined_plot <- (p | (nb_phylo / nb_reads / p4)) +
 combined_plot
 ```
 
-![Combined plot (Figure 3 in manuscript)](files/figures/plot_12.png)
+![Combined plot (Figure S2 in manuscript)](files/figures/plot_12.png)
 
 
 #### NTUs Upset plot
@@ -1278,7 +1280,7 @@ gg2_styled <- ggplot(melt_intersect, aes(x = Method, y = value, fill = variable)
   geom_bar(stat = "identity", position = "stack", width = 0.7) +
   facet_wrap(~ Method, scales = "free", nrow = 1) +
   scale_fill_manual(values = custom_cols, name = NULL) +
-  labs(y = "Number of NTUs reads (%)",
+  labs(y = "Number of reads assigned to NTUs",
        x = NULL) +
   theme_classic(base_size = 14) +
   theme(
@@ -1351,7 +1353,7 @@ combined_plot
 
 ```
 
-![Combined plot (Figure S3 in manuscript)](files/figures/plot_17.png)
+![Combined plot (Figure S4 in manuscript)](files/figures/plot_17.png)
 
 ## Mask and remove *Aedes aegypti* genome sequences
 
@@ -1708,8 +1710,7 @@ df3 <- df3 %>%
 # Set colors
 color_palette <- c("Actinomycetia" = "grey26",
                    "Alphaproteobacteria" = "#FFA500",
-                   "Gammaproteobacteria" = "#6B8E23",
-                   "NA" = "gray")
+                   "Gammaproteobacteria" = "#6B8E23")
 
 # Plot of number of bins by sample and condition
 p5 <- ggplot(df3, aes(x = replicate, y = bins, fill = t_class)) +
@@ -1790,4 +1791,4 @@ combined_plot <- (p5 + p6) +
 combined_plot
 ```
 
-![Combined figure (Figure S5 in manuscript)](files/figures/plot_20.png)
+![Combined figure (Figure 3 in manuscript)](files/figures/plot_20.png)
