@@ -1,4 +1,4 @@
-This project describes the bioinformatics reproducible workflow related to the paper "**Optimizing bacterial enrichment procedures to improve mosquito midgut microbiome research **".
+This project describes the bioinformatics reproducible workflow related to the paper "**Optimizing bacterial enrichment procedures to improve mosquito midgut microbiome research**".
 
 # Download metagenomes
 
@@ -1033,14 +1033,14 @@ for (cmp in comparisons) {
 }
 fwrite(aldex_res, "DA_results_ALDEx2.csv")
 
-# ---- Assemble Table S6 ----
+# ---- Assemble Table S7 ----
 # padj (ALDEx2) is we.eBH: Welch's t-test, Benjamini-Hochberg corrected
-tableS6 <- merge(
+tableS7 <- merge(
   deseq_res[, .(Comparison, Taxon, `log2FC (DESeq2)` = log2FoldChange, `padj (DESeq2)` = padj)],
   aldex_res[, .(Comparison, Taxon, `Effect size (ALDEx2)` = effect, `padj (ALDEx2)` = we.eBH)],
   by = c("Comparison", "Taxon"), sort = FALSE
 )
-write.xlsx(tableS6, "files/tables/Table_S6.xlsx", overwrite = TRUE)
+write.xlsx(tableS7, "files/tables/Table_S7.xlsx", overwrite = TRUE)
 ```
        
 #### Merge of plots
@@ -1679,7 +1679,7 @@ library(dplyr)
 library(stringr)
 
 # Read excel file corresponding to bins table
-file_path <- "files/tables/Table_S7.xlsx"
+file_path <- "files/tables/Table_S8.xlsx"
 df <- read_excel(file_path, sheet = "filtered_bins")
 
 # Add replicates column
